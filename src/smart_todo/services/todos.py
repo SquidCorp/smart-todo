@@ -1,8 +1,8 @@
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from smart_todo.db.todos import insert_task
-from smart_todo.models.todo import StatusEnum, Task, TaskCreate
+from smart_todo.db.todos import get_tasks, insert_task, remove_task
+from smart_todo.models.todo import StatusEnum, Task, TaskCreate, TaskId
 
 
 def create_task(data: TaskCreate) -> Task:
@@ -16,3 +16,11 @@ def create_task(data: TaskCreate) -> Task:
         created_at=now,
         updated_at=now,
     )
+
+
+def get_all_tasks() -> list[Task]:
+    return get_tasks()
+
+
+def delete_task_by_id(data: TaskId) -> None:
+    return remove_task(data.id)

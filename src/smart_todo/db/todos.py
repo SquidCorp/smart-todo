@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, String, delete, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from smart_todo.db.main import Base, session_scope
@@ -65,3 +65,16 @@ def insert_task(
         session.flush()
         session.refresh(row)
         return _to_task(row)
+
+
+def get_tasks() -> list[Task]:
+    with session_scope() as session:
+        rows = session.scalars(
+            select(TaskRow).order_by(TaskRow.created_at.desc()).limit(20)
+        ).all()
+        return [_to_task(row) for row in rows]
+
+
+def remove_task(id: str) -> None:
+    with session_scope() as session:
+        session.execute(delete(TaskRow).where(TaskRow.id == id))

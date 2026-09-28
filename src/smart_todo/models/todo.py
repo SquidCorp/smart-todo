@@ -21,6 +21,10 @@ class TaskCreate(BaseModel):
     priority: PriorityEnum = PriorityEnum.MEDIUM
 
 
+class TaskId(BaseModel):
+    id: str = Field(min_length=1)
+
+
 class Task(BaseModel):
     id: str
     title: str = Field(min_length=1, max_length=200)
