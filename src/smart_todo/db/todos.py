@@ -75,6 +75,36 @@ def get_tasks() -> list[Task]:
         return [_to_task(row) for row in rows]
 
 
+def get_task(id: str) -> Task | None:
+    with session_scope() as session:
+        row = session.get(TaskRow, id)
+        if row is None:
+            return None
+        return _to_task(row)
+
+
 def remove_task(id: str) -> None:
     with session_scope() as session:
         session.execute(delete(TaskRow).where(TaskRow.id == id))
+
+
+def update_task(*, id: str, patch: dict[str, object]) -> Task | None:
+    with session_scope() as session:
+        row = session.get(TaskRow, id)
+        if row is None:
+            return None
+        merged = {
+            **{
+                "title": row.title,
+                "due": row.due,
+                "priority": row.priority,
+                "status": row.status,
+                "updated_at": row.updated_at,
+            },
+            **patch,
+        }
+        for key, value in merged.items():
+            setattr(row, key, value)
+        session.flush()
+        session.refresh(row)
+        return _to_task(row)
